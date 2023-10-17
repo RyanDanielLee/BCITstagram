@@ -55,7 +55,25 @@ const readDir = (dir) => {
  * @param {string} pathProcessed
  * @return {promise}
  */
-const grayScale = (pathIn, pathOut) => {};
+const grayScale = (pathIn, pathOut) => {
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(pathIn)
+      .pipe(new PNG())
+      .on('parsed', function() {
+        for (let y = 0; y < this.height; y++) {
+          for (let x = 0; x < this.width; x++) {
+            let idx = (this.width * y + x) << 2;
+            let grayscale = this.data[idx] * .3 + this.data[idx+1] * .59 + this.data[idx+2] * .11;
+            this.data[idx] = grayscale;
+            this.data[idx+1] = grayscale;
+            this.data[idx+2] = grayscale;
+          }
+        }
+        this.pack().pipe(fs.createWriteStream(pathOut)).on('finish', resolve).on('error', reject);
+      })
+      .on('error', reject);
+  });
+};
 
 module.exports = {
   unzip,
