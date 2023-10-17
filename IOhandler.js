@@ -6,12 +6,11 @@
  * Created Date: October 16, 2023
  * Author: Ryan Lee
  *
+ * Note: This file uses AdmZip instead of unzipper because unzipper created courrpted images
+ * The original code provided has also been modified to accomodate for these changes
  */
 
-// const unzipper = require("unzipper"),
-//   fs = require("fs"),
-//   PNG = require("pngjs").PNG,
-//   path = require("path");
+
 const fs = require('fs');
 const path = require('path');
 const AdmZip = require('adm-zip');
@@ -24,15 +23,8 @@ const PNG = require('pngjs').PNG;
  * @param {string} pathOut
  * @return {promise}
  */
-// const unzip = (pathIn, pathOut) => {
-//   return new Promise((resolve, reject) => {
-//     fs.createReadStream(pathIn)
-//     .pipe(unzipper.Extract({ path: pathOut}))
-//     .on("end", resolve)
-//     .on("error", reject)
-//   })
-// };
-function unzipFile(pathIn, pathOut) {
+
+function unzip(pathIn, pathOut) {
   return new Promise((resolve, reject) => {
       try {
           let zip = new AdmZip(pathIn);
@@ -55,17 +47,7 @@ function unzipFile(pathIn, pathOut) {
  * @param {string} path
  * @return {promise}
  */
-// const readDir = (dir) => {
-//   return new Promise((resolve, reject) => {
-//     fs.readdir(dir, (err, files) => {
-//       if (err) { 
-//         reject(err);
-//       } else {
-//         resolve(files.map(file => path.join(dir, file)));
-//       }
-//     });
-//   });
-// };
+
 const readDir = (dir) => {
   return new Promise((resolve, reject) => {
     fs.readdir(dir, (err, files) => {
@@ -79,7 +61,6 @@ const readDir = (dir) => {
   });
 };
 
-
 /**
  * Description: Read in png file by given pathIn,
  * convert to grayscale and write to given pathOut
@@ -88,25 +69,6 @@ const readDir = (dir) => {
  * @param {string} pathProcessed
  * @return {promise}
  */
-// const grayScale = (pathIn, pathOut) => {
-//   return new Promise((resolve, reject) => {
-//     fs.createReadStream(pathIn)
-//       .pipe(new PNG())
-//       .on('parsed', function() {
-//         for (let y = 0; y < this.height; y++) {
-//           for (let x = 0; x < this.width; x++) {
-//             let idx = (this.width * y + x) << 2;
-//             let grayscale = this.data[idx] * .3 + this.data[idx+1] * .59 + this.data[idx+2] * .11;
-//             this.data[idx] = grayscale;
-//             this.data[idx+1] = grayscale;
-//             this.data[idx+2] = grayscale;
-//           }
-//         }
-//         this.pack().pipe(fs.createWriteStream(pathOut)).on('finish', resolve).on('error', reject);
-//       })
-//       .on('error', reject);
-//   });
-// };
 
 function grayScale(pathIn, pathOut) {
   return new Promise((resolve, reject) => {
@@ -128,9 +90,8 @@ function grayScale(pathIn, pathOut) {
   });
 }
 
-// module.exports = {
-//   unzip,
-//   readDir,
-//   grayScale,
-// };
-module.exports = { unzipFile, readDir, grayScale };
+module.exports = { 
+  unzip, 
+  readDir, 
+  grayScale 
+};

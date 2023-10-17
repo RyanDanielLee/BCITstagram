@@ -2,11 +2,13 @@ const path = require("path");
 /*
  * Project: Milestone 1
  * File Name: main.js
- * Description:
+ * Description: This program will unzip a zip file, read all the png files from the unzipped directory, 
+ * grayscale each image, and save the grayscaled images to a new directory
  *
- * Created Date:
- * Author:
+ * Created Date: October 16, 2023
+ * Author: Ryan Lee
  *
+ * Note: This file uses AdmZip instead of unzipper because unzipper created courrpted images
  */
 
 const IOhandler = require("./IOhandler");
@@ -14,7 +16,7 @@ const zipFilePath = path.join(__dirname, "myfile.zip");
 const pathUnzipped = path.join(__dirname, "unzipped");
 const pathProcessed = path.join(__dirname, "grayscaled");
 
-IOhandler.unzipFile(zipFilePath, pathUnzipped)
+IOhandler.unzip(zipFilePath, pathUnzipped)
   .then(() => IOhandler.readDir(pathUnzipped))
   .then(imagePaths => {
     let promises = []
