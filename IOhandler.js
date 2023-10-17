@@ -47,15 +47,32 @@ const unzip = (pathIn, pathOut) => new Promise((resolve, reject) => {
  */
 
 const readDir = dir => new Promise((resolve, reject) => {
-  fs.readdir(dir, (err, files) => {
-      if (err) {
-          reject(err);
-      } else {
-          files = files.filter(file => fs.lstatSync(path.join(dir, file)).isFile());
-          resolve(files.map(file => path.join(dir, file)));
-      }
+    fs.promises.readdir(dir)
+      .then(files => {
+        let promises = files.map(file => {
+          let filePath = path.join(dir, file);
+          return fs.promises.stat(filePath)
+            .then(stats => {
+              if (stats.isFile()) {
+                return filePath;
+              } else {
+                return null;
+              }
+            });
+        });
+        return Promise.all(promises);
+      })
+      .then(filePaths => {
+        let validFilePaths = [];
+        for (let i = 0; i < filePaths.length; i++) {
+          if (filePaths[i] !== null) {
+            validFilePaths.push(filePaths[i]);
+          }
+        }
+        resolve(validFilePaths);
+      })
+      .catch(reject);
   });
-});
 
 /**
  * Description: Read in png file by given pathIn,
