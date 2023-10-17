@@ -24,22 +24,20 @@ const PNG = require('pngjs').PNG;
  * @return {promise}
  */
 
-function unzip(pathIn, pathOut) {
-  return new Promise((resolve, reject) => {
-      try {
-          let zip = new AdmZip(pathIn);
-          zip.extractAllToAsync(pathOut, true, err => {
-              if (err) {
-                 reject(err);
-              } else { 
-                resolve();
-              }
-          });
-      } catch (err) {
-          reject(err);
-      }
-  });
-}
+const unzip = (pathIn, pathOut) => new Promise((resolve, reject) => {
+  try {
+      let zip = new AdmZip(pathIn);
+      zip.extractAllToAsync(pathOut, true, err => {
+          if (err) {
+              reject(err);
+          } else {
+              resolve();
+          }
+      });
+  } catch (err) {
+      reject(err);
+  }
+});
 
 /**
  * Description: read all the png files from given directory and return Promise containing array of each png file path
@@ -48,18 +46,16 @@ function unzip(pathIn, pathOut) {
  * @return {promise}
  */
 
-const readDir = (dir) => {
-  return new Promise((resolve, reject) => {
-    fs.readdir(dir, (err, files) => {
+const readDir = dir => new Promise((resolve, reject) => {
+  fs.readdir(dir, (err, files) => {
       if (err) {
-        reject(err);
+          reject(err);
       } else {
-        files = files.filter(file => fs.lstatSync(path.join(dir, file)).isFile());
-        resolve(files.map(file => path.join(dir, file)));
+          files = files.filter(file => fs.lstatSync(path.join(dir, file)).isFile());
+          resolve(files.map(file => path.join(dir, file)));
       }
-    });
   });
-};
+});
 
 /**
  * Description: Read in png file by given pathIn,
@@ -70,25 +66,23 @@ const readDir = (dir) => {
  * @return {promise}
  */
 
-function grayScale(pathIn, pathOut) {
-  return new Promise((resolve, reject) => {
-      fs.createReadStream(pathIn)
-          .pipe(new PNG())
-          .on('parsed', function() {
-              for (let y = 0; y < this.height; y++) {
-                  for (let x = 0; x < this.width; x++) {
-                      let idx = (this.width * y + x) << 2;
-                      let grayscale = (this.data[idx] + this.data[idx+1] + this.data[idx+2]) / 3;
-                      this.data[idx] = grayscale;
-                      this.data[idx+1] = grayscale;
-                      this.data[idx+2] = grayscale;
-                  }
+const grayScale = (pathIn, pathOut) => new Promise((resolve, reject) => {
+  fs.createReadStream(pathIn)
+      .pipe(new PNG())
+      .on('parsed', function() {
+          for (let y = 0; y < this.height; y++) {
+              for (let x = 0; x < this.width; x++) {
+                  let idx = (this.width * y + x) << 2;
+                  let grayscale = (this.data[idx] + this.data[idx + 1] + this.data[idx + 2]) / 3;
+                  this.data[idx] = grayscale;
+                  this.data[idx + 1] = grayscale;
+                  this.data[idx + 2] = grayscale;
               }
-              this.pack().pipe(fs.createWriteStream(pathOut)).on('finish', resolve).on('error', reject);
-          })
-          .on('error', reject);
-  });
-}
+          }
+          this.pack().pipe(fs.createWriteStream(pathOut)).on('finish', resolve).on('error', reject);
+      })
+      .on('error', reject);
+});
 
 module.exports = { 
   unzip, 
