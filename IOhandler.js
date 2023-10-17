@@ -35,7 +35,17 @@ const unzip = (pathIn, pathOut) => {
  * @param {string} path
  * @return {promise}
  */
-const readDir = (dir) => {};
+const readDir = (dir) => {
+  return new Promise((resolve, reject) => {
+    fs.readdir(dir, (err, files) => {
+      if (err) { 
+        reject(err);
+      } else {
+        resolve(files.map(file => path.join(dir, file)));
+      }
+    });
+  });
+};
 
 /**
  * Description: Read in png file by given pathIn,
