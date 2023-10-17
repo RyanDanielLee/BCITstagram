@@ -116,14 +116,12 @@ function grayScale(pathIn, pathOut) {
               for (let y = 0; y < this.height; y++) {
                   for (let x = 0; x < this.width; x++) {
                       let idx = (this.width * y + x) << 2;
-                      // Adjust the weights used to calculate the grayscale value
                       let grayscale = (this.data[idx] + this.data[idx+1] + this.data[idx+2]) / 3;
                       this.data[idx] = grayscale;
                       this.data[idx+1] = grayscale;
                       this.data[idx+2] = grayscale;
                   }
               }
-              // Save the grayscaled image to a separate directory
               this.pack().pipe(fs.createWriteStream(pathOut)).on('finish', resolve).on('error', reject);
           })
           .on('error', reject);
